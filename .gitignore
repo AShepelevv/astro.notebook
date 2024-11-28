@@ -13,3 +13,4 @@ tikz/**
 .idea/**
 out/**
 **/.ipynb_checkpoints/**
+result/
