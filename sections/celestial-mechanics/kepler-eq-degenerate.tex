@@ -1,0 +1,136 @@
+\subsection{Уравнение Кеплера для вырожденного эллипса}
+\label{sec:kepler-eq-degenerate}
+Пусть тело отпущено без начальной скорости на расстоянии $r_0$ от притягивающего центра массы $M$. Сила тяготения всё время направлена вдоль радиус-вектора, поэтому тело движется по прямой, падая на центр. Казалось бы, законы Кеплера здесь ни при чём, однако такое движение~--- тоже кеплерово, только орбита его особенная.
+
+Момент импульса тела равен нулю, значит, равен нулю и параметр орбиты $p = L^2 / (GMm^2)$ в уравнении \eqref{eq:first-kepler-law-conic-seq-eq}: коническое сечение вырождается в отрезок. Полная энергия тела $E_0 = -GMm / r_0$ отрицательна, так что орбита эллиптическая, а её большая полуось находится из $E_0 = -GMm / (2a)$:
+\begin{equation*}
+    a = \frac{r_0}{2}.
+\end{equation*}
+Малая полуось такого эллипса $b = 0$, а эксцентриситет $e = \sqrt{1 - b^2 / a^2} = 1$. Такой эллипс называется \term{вырожденным}: это отрезок длиной $2a = r_0$, а его фокусы лежат на концах отрезка. Притягивающий центр находится в фокусе $F$, тело начинает движение в апоцентре $Q$ на расстоянии $a(1 + e) = 2a = r_0$ и падает в перицентр, который в вырожденном эллипсе совпадает с фокусом: $a (1 - e) = 0$.
+
+\begin{figure}[h!]
+    \centering
+%    \vspace{-0.5pc}
+    \tikzsetnextfilename{kepler-eq-degenerate}
+    \begin{tikzpicture}
+        \footnotesize
+
+        % Независимые параметры: большая полуось, эксцентриситет тонкого
+        % эллипса и эксцентрическая аномалия тела
+        \pgfmathsetmacro{\a}{3}
+        \pgfmathsetmacro{\e}{0.95}
+        \pgfmathsetmacro{\E}{135}
+
+        \pgfmathsetmacro{\b}{\a * sqrt(1 - \e * \e)}
+        \pgfmathsetmacro{\c}{\a * \e}
+
+        \coordinate (C) at (0, 0);
+        \coordinate (P) at (\a, 0);
+        \coordinate (Q) at (-\a, 0);
+        \coordinate (F) at (\c, 0);
+        \coordinate (A) at (\E:\a);
+        \coordinate (H) at ({\a * cos(\E)}, 0);
+        \coordinate (B) at ({\a * cos(\E)}, {\b * sin(\E)});
+
+        % промежуточные стадии растяжения тонкого эллипса в окружность
+        \foreach \k in {0.45, 0.72} {
+            \draw [lightgray] (P) arc(0:180:{\a} and {\k * \a});
+        }
+        \foreach \x in {-0.5 * \a, 0.5 * \a} {
+            \draw [gray, -latex] (\x, {\b * sqrt(1 - \x * \x / \a / \a)})
+                -- (\x, {\a * sqrt(1 - \x * \x / \a / \a)});
+        }
+
+        \draw [semithick] (P) arc(0:180:\a);
+        \draw [thick] (P) arc(0:180:{\a} and {\b});
+        \draw [semithick] (Q) -- (P);
+
+        \draw [dashes] (H) -- (A);
+        \draw (C) -- (A);
+        \draw (F) -- (B);
+
+        \draw [line cap = butt] (0.3, 0) arc(0:\E:0.3);
+        \draw (\E / 7:0.5) node {$E$};
+
+        \foreach \pt in {C, P, Q, F, A, B, H} {\fill (\pt) circle (1.2pt);}
+        \draw (C) node [anchor = north] {$C$};
+        \draw (P) node [anchor = west] {$P$};
+        \draw (Q) node [anchor = east] {$Q$};
+        \draw (F) node [anchor = north] {$F$};
+        \draw (A) node [anchor = south east] {$A$};
+        \draw (B) node [anchor = south east] {$B$};
+        \draw (H) node [anchor = north] {$H$};
+        \draw ($(B)!0.75!(F)$) node [anchor = south] {$r$};
+    \end{tikzpicture}
+    \caption{Растяжение тонкого эллипса, $e = 0.95$, в окружность}
+    \label{pic:kepler-eq-degenerate}
+\end{figure}
+\paragraph{Предельный переход} Уравнение Кеплера \eqref{eq:kepler-eq} выводилось через площади секторов, а площадь вырожденного эллипса равна нулю, и картинка с секторами теряет смысл. Однако ничто не мешает рассмотреть тонкий эллипс с эксцентриситетом, близким к единице, \lookPicRef{pic:kepler-eq-degenerate}. Движение по нему почти неотличимо от падения по прямой: тело отклоняется от отрезка $QP$ лишь вблизи фокуса, где огибает центр и поворачивает назад. Растяжение вдоль малой оси с коэффициентом $a / b$, сколь угодно большим, переводит тонкий эллипс в окружность радиуса $a$, и весь вывод уравнения Кеплера проходит без изменений. Формулы \eqref{eq:kepler-eq} и \eqref{eq:kepler-eq-r-E} верны при любом $e < 1$ и зависят от $e$ непрерывно, поэтому они остаются верными и в пределе $e \to 1$:
+\begin{equation}
+    r = a (1 - \cos E),
+    \qquad
+    M = E - \sin E.
+    \label{eq:kepler-eq-degenerate}
+\end{equation}
+Геометрический смысл эксцентрической аномалии при этом сохраняется. Положению тела $B$ на отрезке отвечает точка $A$ окружности с той же абсциссой, а $E$~--- угол $\angle ACP$. Фокус $F$ в вырожденном эллипсе совпадает с $P$, так что расстояние до центра $r = |FB| = |PH| = a - a \cos E$ читается прямо с рисунка.
+
+\paragraph{Время падения} Тело начинает движение в апоцентре $Q$, где $E = \pi$, и достигает центра при $E = 2\pi$. Удобнее отсчитывать угол от апоцентра: положим $\theta = E - \pi$, тогда $\cos E = -\cos\theta$, $\sin E = -\sin\theta$, и \eqref{eq:kepler-eq-degenerate} принимает вид
+\begin{equation*}
+    r = a (1 + \cos\theta),
+    \qquad
+    M = \pi + \theta + \sin\theta.
+\end{equation*}
+Средняя аномалия растёт равномерно, за период $T$ на $2\pi$, а в начальный момент $\theta = 0$ и $M = \pi$, поэтому $M - \pi = 2\pi t / T$. Период найдём из третьего закона Кеплера \eqref{eq:kepler-third-law} с $a = r_0 / 2$:
+\begin{equation*}
+    T = 2\pi\sqrt{\frac{a^3}{GM}} = 2\pi\sqrt{\frac{r_0^3}{8GM}}.
+\end{equation*}
+Собирая всё вместе, получаем закон движения при падении на центр в параметрическом виде:
+\begin{equation}
+    r = \frac{r_0}{2}(1 + \cos\theta),
+    \qquad
+    t = \sqrt{\frac{r_0^3}{8GM}}\,(\theta + \sin\theta),
+    \label{eq:degenerate-fall}
+\end{equation}
+здесь параметр $\theta$ меняется от $0$ в начале падения до $\pi$ в момент достижения центра. Отсюда \term{время падения}
+\begin{equation}
+    t_\text{пад} = \pi\sqrt{\frac{r_0^3}{8GM}} = \frac{T}{2}.
+    \label{eq:degenerate-fall-time}
+\end{equation}
+\begin{wrapfigure}[11]{l}{0.42\tw}
+    \centering
+    \vspace{-0.5pc}
+    \tikzsetnextfilename{degenerate-fall}
+    \begin{tikzpicture}
+        \footnotesize
+        \begin{axis}[
+            width = 0.42\tw,
+            height = 4.2cm,
+            xmin = 0, xmax = 1,
+            ymin = 0, ymax = 1,
+            xlabel = {$t / t_\text{пад}$},
+            ylabel = {$r / r_0$},
+            xtick = {0, 0.5, 1},
+            ytick = {0, 0.5, 1},
+        ]
+            \addplot [black, domain = 0:180, samples = 60]
+                ({(x * pi / 180 + sin(x)) / pi}, {(1 + cos(x)) / 2});
+            \addplot [dashes] coordinates {(0, 0.5) (0.818, 0.5) (0.818, 0)};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Расстояние до центра при падении из состояния покоя}
+    \label{pic:degenerate-fall}
+\end{wrapfigure}
+Оно равно половине периода вырожденной орбиты, и это естественно: вторая половина периода~--- обратный путь, тело, проскочив точечный центр, поднимается назад к $Q$. Полезно сравнить $t_\text{пад}$ с периодом $T_0 = 2\pi\sqrt{r_0^3 / GM}$ круговой орбиты радиуса $r_0$:
+\begin{equation*}
+    t_\text{пад} = \frac{T_0}{4\sqrt{2}} \simeq 0.18\, T_0.
+\end{equation*}
+Например, если Землю остановить на орбите, она упадёт на Солнце за $365.25 / (4\sqrt{2}) \simeq 65$ суток.
+
+Падение происходит крайне неравномерно, \lookPicRef{pic:degenerate-fall}. Первую половину пути, от $r_0$ до $r_0 / 2$, тело проходит при изменении $\theta$ от $0$ до $\pi / 2$, то есть за время $\sqrt{r_0^3 / 8GM}\,(\pi / 2 + 1)$~--- это $(\pi / 2 + 1) / \pi \simeq 82\%$ всего времени падения. На вторую половину пути остаётся лишь $18\%$: почти всё время тело медленно набирает скорость вдали от центра, а последнюю часть пути пролетает стремительно.
+
+\paragraph{Время свободного падения} Формула \eqref{eq:degenerate-fall-time} описывает и сжатие однородного шара из невзаимодействующих частиц, например, облака пыли. На слой, находящийся на расстоянии $r_0$ от центра, действует только масса внутри него, $M(r_0) = \frac{4}{3}\pi\rho r_0^3$, поэтому
+\begin{equation}
+    t_\text{пад} = \pi\sqrt{\frac{r_0^3}{8G \cdot \frac{4}{3}\pi\rho r_0^3}} = \sqrt{\frac{3\pi}{32 G\rho}}.
+    \label{eq:free-fall-time}
+\end{equation}
+Радиус $r_0$ сократился: все слои достигают центра одновременно, и шар в процессе сжатия остаётся однородным. Это время называется \term{временем свободного падения} и зависит только от плотности; оно задаёт масштаб времени сжатия облаков при образовании звёзд.
