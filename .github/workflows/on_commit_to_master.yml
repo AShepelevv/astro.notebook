@@ -11,6 +11,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Create resources folder
         run: mkdir -p tikz/resource
+      - name: Cache externalized tikz figures
+        uses: actions/cache@v4
+        with:
+          path: tikz/resource
+          key: tikz-${{ hashFiles('astro-notebook.tex', 'sections/**', 'sys/**/*.tex', 'style/**') }}
+          restore-keys: tikz-
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v3
         with:
