@@ -8,39 +8,136 @@
     \begin{tikzpicture}
         \footnotesize
 
-        \draw [dashes] (-3.3, 0) -- (4.2, 0);
-        \fill [lightgray!60] (-0.041, 1.22) arc(156:204:3) -- (0.041, -1.22) arc(-24:24:3) -- cycle;
-        \draw [semithick] (2.7, 0) ++(180-24:3) arc(180-24:180+24:3);
-        \draw [semithick] (-2.7, 0) ++(-24:3) arc(-24:24:3);
+        % Независимые параметры: радиус кривизны поверхностей, половина
+        % расстояния между их вершинами (только для наглядности), высота
+        % края линзы, высота луча над осью и угол его отклонения
+        \pgfmathsetmacro{\lensR}{3}
+        \pgfmathsetmacro{\lensGap}{0.3}
+        \pgfmathsetmacro{\lensEdge}{1.22}
+        \pgfmathsetmacro{\rayH}{0.9}
+        \pgfmathsetmacro{\rayDelta}{14}
 
-        \draw [line width = 1pt] (-3.2, 0.9) -- (0, 0.9) -- (3.6, 0);
-        \draw [line width = 1pt, -latex] (-3.2, 0.9) -- (-1.8, 0.9);
-        \draw [line width = 1pt, -latex] (0, 0.9) -- (2, 0.4);
-        \draw [dashes] (0, 0.9) -- (1.6, 0.9);
-        \draw [line cap = butt] (1.2, 0.9) arc(0:-14:1.2);
+        % Производные величины: полуугол дуги поверхности, смещение её
+        % центра кривизны от центра линзы, фокусное расстояние
+        \pgfmathsetmacro{\edgeAngle}{asin(\lensEdge / \lensR)}
+        \pgfmathsetmacro{\centerShift}{\lensR - \lensGap}
+        \pgfmathsetmacro{\focal}{\rayH / tan(\rayDelta)}
 
-        \draw [latex-latex] (-2.5, 0) -- (-2.5, 0.9);
-        \draw [latex-latex] (0, -1.4) -- (3.6, -1.4);
-        \draw (0, -1.55) -- (0, -1.25);
-        \draw (3.6, -1.55) -- (3.6, -1.25);
+        \coordinate (O) at (0, 0);
+        \coordinate (F) at (\focal, 0);
+        \coordinate (C1) at (\centerShift, 0);    % центр кривизны первой поверхности
+        \coordinate (C2) at (-\centerShift, 0);   % центр кривизны второй поверхности
+        \coordinate (I) at (0, \rayH);            % точка преломления луча
+        \coordinate (S) at ($(C2) + (-0.5, \rayH)$); % начало луча
 
-        \draw (-2.5, 0.45) node[anchor=east] {$h$};
-        \draw (1.3, 0.75) node[anchor=west] {$\delta$};
-        \draw (1.8, -1.4) node[anchor=north] {$F$};
-        \draw (3.6, 0) node[anchor=south west] {$F$};
-        \draw (0.1, 0) node[anchor=north east] {$O$};
-        \draw (-0.3, -0.8) node[anchor=east] {$R_1$};
-        \draw (0.3, -0.8) node[anchor=west] {$R_2$};
+        \draw [dashes] ($(C2) + (-0.6, 0)$) -- ($(F) + (0.6, 0)$);
+        \fill [lightgray!60] ($(C1) + (180-\edgeAngle:\lensR)$) arc(180-\edgeAngle:180+\edgeAngle:\lensR)
+            -- ($(C2) + (-\edgeAngle:\lensR)$) arc(-\edgeAngle:\edgeAngle:\lensR) -- cycle;
+        \draw [semithick] ($(C1) + (180-\edgeAngle:\lensR)$) arc(180-\edgeAngle:180+\edgeAngle:\lensR);
+        \draw [semithick] ($(C2) + (-\edgeAngle:\lensR)$) arc(-\edgeAngle:\edgeAngle:\lensR);
 
-        \draw [fill=white] (3.6, 0) circle (.03);
-        \draw [fill=white] (0, 0) circle (.03);
+        \draw [line width = 1pt] (S) -- (I) -- (F);
+        \draw [line width = 1pt, -latex] (S) -- ($(S)!0.45!(I)$);
+        \draw [line width = 1pt, -latex] (I) -- ($(I)!0.55!(F)$);
+        \draw [dashes] (I) -- ($(I) + (1.6, 0)$);
+        \draw [line cap = butt] ($(I) + (1.2, 0)$) arc(0:-\rayDelta:1.2);
+
+        \coordinate (H) at ($(C2) + (0.2, 0)$);
+        \coordinate (M) at (0, -\lensEdge - 0.18);
+        \draw [latex-latex] (H) -- (H |- I);
+        \draw [latex-latex] (M) -- (F |- M);
+        \draw ($(M) + (0, -0.15)$) -- ($(M) + (0, 0.15)$);
+        \draw ($(F |- M) + (0, -0.15)$) -- ($(F |- M) + (0, 0.15)$);
+
+        \draw ($(H)!0.5!(H |- I)$) node [anchor=east] {$h$};
+        \draw ($(I) + (-\rayDelta/2:1.3)$) node [anchor=west] {$\delta$};
+        \draw ($(M)!0.5!(F |- M)$) node [anchor=north] {$F$};
+        \draw (F) node [anchor=south west] {$F$};
+        \draw ($(O) + (0.1, 0)$) node [anchor=north east] {$O$};
+        \draw (-\lensGap, -0.8) node [anchor=east] {$R_1$};
+        \draw (\lensGap, -0.8) node [anchor=west] {$R_2$};
+
+        \draw [fill=white] (F) circle (.03);
+        \draw [fill=white] (O) circle (.03);
     \end{tikzpicture}
     \caption{Ход луча, параллельного оптической оси, в тонкой двояковыпуклой линзе}
     \label{pic:lensmaker-formula}
 \end{wrapfigure}
-Фокусное расстояние тонкой линзы определяется двумя вещами: материалом, из которого она сделана, и формой её поверхностей. Соотношение, связывающее фокусное расстояние с показателем преломления $n$ материала и радиусами кривизны $R_1$ и $R_2$ поверхностей, называется \term{формулой шлифовщика}: именно по ней шлифовщик подбирает радиусы, чтобы получить линзу с заданным фокусным расстоянием.
+Фокусное расстояние тонкой линзы определяется двумя факторами: материалом, из которого она сделана, и формой её поверхностей. Соотношение, связывающее фокусное расстояние с показателем преломления $n$ материала и радиусами кривизны $R_1$ и $R_2$ поверхностей, называется \term{формулой шлифовщика}: именно по ней шлифовщик подбирает радиусы, чтобы получить линзу с заданным фокусным расстоянием.
 
-\paragraph{Тонкая призма} Сначала найдём, на какой угол отклоняет луч тонкая призма с малым преломляющим углом $\gamma$. Пусть луч падает на первую грань под углом $\alpha_1$ к нормали. После преломления он идёт внутри призмы под углом $\beta_1 = \alpha_1 / n$. Нормали к граням призмы образуют между собой угол $\gamma$, поэтому на вторую грань луч падает под углом $\beta_2 = \gamma - \beta_1$ и выходит из призмы под углом $\alpha_2 = n \beta_2$. Угол отклонения луча от первоначального направления в параксиальном приближении 
+\begin{wrapfigure}[8]{l}{0.55\tw}
+    \centering
+    \vspace{-1pc}
+    \tikzsetnextfilename{thin-prism}
+    \begin{tikzpicture}[scale=1.1]
+        \footnotesize
+
+        % Независимые параметры: показатель преломления, преломляющий угол,
+        % высота призмы и глубина точки, в которой луч пересекает её ось
+        % симметрии. Луч входит в призму параллельно основанию.
+        \pgfmathsetmacro{\prismN}{1.5}
+        \pgfmathsetmacro{\prismGamma}{50}
+        \pgfmathsetmacro{\prismHeight}{2.8}
+        \pgfmathsetmacro{\crossDepth}{1.5}
+
+        % Ход луча по закону Снеллиуса: падение на первую грань под углом
+        % gamma/2, преломление, падение на вторую грань, выход
+        \pgfmathsetmacro{\halfGamma}{\prismGamma / 2}
+        \pgfmathsetmacro{\alphaOne}{\halfGamma}
+        \pgfmathsetmacro{\betaOne}{asin(sin(\alphaOne) / \prismN)}
+        \pgfmathsetmacro{\betaTwo}{\prismGamma - \betaOne}
+        \pgfmathsetmacro{\alphaTwo}{asin(\prismN * sin(\betaTwo))}
+        % направления луча внутри призмы и после выхода из неё
+        \pgfmathsetmacro{\innerDir}{-\halfGamma + \betaOne}
+        \pgfmathsetmacro{\exitDir}{\halfGamma - \alphaTwo}
+        \pgfmathsetmacro{\slant}{\prismHeight / cos(\halfGamma)}
+
+        \coordinate (A) at (0, 0);
+        \coordinate (BL) at ($(A) + (270-\halfGamma:\slant)$);
+        \coordinate (BR) at ($(A) + (270+\halfGamma:\slant)$);
+        \coordinate (C) at ($(A) + (0, -\crossDepth)$);
+        \coordinate (D) at ($(C) + (\innerDir:1)$);
+        \coordinate (P1) at (intersection of A--BL and C--D);   % точка входа луча
+        \coordinate (P2) at (intersection of A--BR and C--D);   % точка выхода луча
+        \coordinate (E) at ($(P2) + (\exitDir:1)$);
+        \coordinate (G) at ($(P1) + (1, 0)$);
+        \coordinate (Q) at (intersection of P1--G and P2--E);   % вершина угла отклонения
+
+        \fill [lightgray!60] (A) -- (BL) -- (BR) -- cycle;
+        \draw [semithick] (A) -- (BL) -- (BR) -- cycle;
+
+        % нормали к граням
+        \draw [dashes] ($(P1) + (180-\halfGamma:1.2)$) -- ($(P1) + (-\halfGamma:0.5)$);
+        \draw [dashes] ($(P2) + (180+\halfGamma:0.5)$) -- ($(P2) + (\halfGamma:1.2)$);
+
+        % первоначальное направление и продолжение вышедшего луча
+        \draw [dashes] (P1) -- ($(Q) + (0:2.25)$);
+        \draw [dashes] (Q) -- (P2);
+
+        % ход луча
+        \draw [line width = 1pt] ($(P1) + (180:1.75)$) -- (P1) -- (P2) -- ($(Q) + (\exitDir:2.25)$);
+        \draw [line width = 1pt, -latex] ($(P1) + (180:1.75)$) -- ($(P1) + (180:1.05)$);
+        \draw [line width = 1pt, -latex] (P2) -- ($(P2) + (\exitDir:1.3)$);
+
+        % углы
+        \draw [line cap = butt] ($(A) + (270-\halfGamma:0.5)$) arc(270-\halfGamma:270+\halfGamma:0.5);
+        \draw [line cap = butt] ($(P1) + (180-\halfGamma:0.55)$) arc(180-\halfGamma:180:0.55);
+        \draw [line cap = butt] ($(P1) + (-\halfGamma:0.45)$) arc(-\halfGamma:\innerDir:0.45);
+        \draw [line cap = butt] ($(P2) + (180+\innerDir:0.45)$) arc(180+\innerDir:180+\halfGamma:0.45);
+        \draw [line cap = butt] ($(P2) + (\exitDir:0.6)$) arc(\exitDir:\halfGamma:0.6);
+        \draw [line cap = butt] ($(Q) + (\exitDir:1.9)$) arc(\exitDir:0:1.9);
+
+        \draw ($(A) + (270:0.5)$) node [anchor=north] {$\gamma$};
+        \draw ($(P1) + (180-\halfGamma/2:1.0)$) node {$\alpha_1$};
+        \draw ($(P1) + (-70:0.15)$) node [anchor=north west] {$\beta_1$};
+        \draw ($(P2) + (240:0.2)$) node [anchor=north east] {$\beta_2$};
+        \draw ($(P2) + ({(\exitDir + \halfGamma) / 2}:0.7)$) node [anchor=west] {$\alpha_2$};
+        \draw ($(Q) + ({\exitDir / 2}:1.95)$) node [anchor=west] {$\delta$};
+    \end{tikzpicture}
+    \caption{Ход луча в тонкой призме с преломляющим углом $\gamma$}
+    \label{pic:thin-prism}
+\end{wrapfigure}
+\paragraph{Тонкая призма} Сначала найдём, на какой угол отклоняет луч тонкая призма с малым преломляющим углом $\gamma$, \lookPicRef{pic:thin-prism}. Все углы будем считать малыми. В оптике это называется \term{параксиальным приближением}: рассматриваются лучи, идущие вблизи оптической оси и под малыми углами к ней, так что синусы и тангенсы углов можно заменить самими углами, а закон Снеллиуса $\sin \alpha = n \sin \beta$ принимает вид $\alpha = n \beta$. Пусть луч падает на первую грань под углом $\alpha_1$ к нормали. После преломления он идёт внутри призмы под углом $\beta_1 = \alpha_1 / n$. Нормали к граням призмы образуют между собой угол $\gamma$, поэтому на вторую грань луч падает под углом $\beta_2 = \gamma - \beta_1$ и выходит из призмы под углом $\alpha_2 = n \beta_2$. Угол отклонения луча от первоначального направления
 \begin{equation}
     \delta = \alpha_1 + \alpha_2 - \gamma
            = \alpha_1 + n \left(\gamma - \frac{\alpha_1}{n}\right) - \gamma
@@ -48,64 +145,13 @@
     \label{eq:thin-prism}
 \end{equation}
 
-\begin{wrapfigure}[8]{l}{0.55\tw}
-    \centering
-%    \vspace{-1pc}
-    \tikzsetnextfilename{thin-prism}
-    \begin{tikzpicture}[scale=1.1]
-        \footnotesize
-
-        % призма с преломляющим углом 50 градусов, n = 1.5,
-        % луч входит параллельно основанию (угол падения 25 градусов)
-        % и внутри призмы проходит через точку (0, 0.5) на оси симметрии
-        \coordinate (A) at (0, 2);
-        \coordinate (BL) at (-1.299, -0.786);
-        \coordinate (BR) at (1.299, -0.786);
-        \coordinate (P1) at (-0.654, 0.599);
-        \coordinate (P2) at (0.753, 0.386);
-        \coordinate (Q) at (0.400, 0.599);
-
-        \fill [lightgray!60] (A) -- (BL) -- (BR) -- cycle;
-        \draw [semithick] (A) -- (BL) -- (BR) -- cycle;
-
-        % нормали к граням
-        \draw [dashes] ($(P1) + (155:1.2)$) -- ($(P1) + (-25:0.5)$);
-        \draw [dashes] ($(P2) + (205:0.5)$) -- ($(P2) + (25:1.2)$);
-
-        % первоначальное направление и продолжение вышедшего луча
-        \draw [dashes] (P1) -- (2.6, 0.599);
-        \draw [dashes] (Q) -- (P2);
-
-        % ход луча
-        \draw [line width = 1pt] (-2.4, 0.599) -- (P1) -- (P2) -- ($(P2) + (-31.1:1.8)$);
-        \draw [line width = 1pt, -latex] (-2.4, 0.599) -- (-1.7, 0.599);
-        \draw [line width = 1pt, -latex] (P2) -- ($(P2) + (-31.1:1.3)$);
-
-        % углы
-        \draw [line cap = butt] ($(A) + (245:0.5)$) arc(245:295:0.5);
-        \draw [line cap = butt] ($(P1) + (155:0.55)$) arc(155:180:0.55);
-        \draw [line cap = butt] ($(P1) + (-25:0.45)$) arc(-25:-8.6:0.45);
-        \draw [line cap = butt] ($(P2) + (171.4:0.45)$) arc(171.4:205:0.45);
-        \draw [line cap = butt] ($(P2) + (-31.1:0.6)$) arc(-31.1:25:0.6);
-        \draw [line cap = butt] ($(Q) + (-31.1:1.9)$) arc(-31.1:0:1.9);
-
-        \draw ($(A) + (270:0.5)$) node [anchor=north] {$\gamma$};
-        \draw ($(P1) + (167:1.0)$) node {$\alpha_1$};
-        \draw ($(P1) + (-70:0.15)$) node [anchor=north west] {$\beta_1$};
-        \draw ($(P2) + (240:0.2)$) node [anchor=north east] {$\beta_2$};
-        \draw ($(P2) + (-10:0.7)$) node [anchor=west] {$\alpha_2$};
-        \draw ($(Q) + (-17:1.95)$) node [anchor=west] {$\delta$};
-    \end{tikzpicture}
-    \caption{Ход луча в тонкой призме с преломляющим углом $\gamma$}
-    \label{pic:thin-prism}
-\end{wrapfigure}
 Замечательно, что в этом приближении отклонение не зависит от угла падения, а определяется только преломляющим углом призмы и показателем преломления.
 
-\paragraph{Линза как набор призм} Рассмотрим теперь луч, идущий параллельно оптической оси на расстоянии $h$ от неё, \lookPicRef{pic:lensmaker-formula}. В окрестности точки падения каждую поверхность линзы можно заменить касательной плоскостью. Касательная к сфере радиуса $R_1$ на высоте $h$ наклонена к плоскости линзы на угол $\approx h / R_1$, а касательная ко второй поверхности~--- на угол $\approx h / R_2$. Значит, на высоте $h$ линза действует как тонкая призма с преломляющим углом
+\paragraph{Линза как набор призм} Рассмотрим теперь луч, идущий параллельно оптической оси на расстоянии $h$ от неё, \lookPicRef{pic:lensmaker-formula}. В окрестности точки падения каждую поверхность линзы можно заменить касательной плоскостью. Касательная к сфере радиуса $R_1$ на высоте $h$ наклонена к плоскости линзы на угол $h / R_1$, а касательная ко второй поверхности~--- на угол $h / R_2$: мы по-прежнему остаёмся в параксиальном приближении, $h \ll R_1, R_2$. Значит, на высоте $h$ линза действует как тонкая призма с преломляющим углом
 \begin{equation*}
     \gamma = \frac{h}{R_1} + \frac{h}{R_2}.
 \end{equation*}
-Согласно \eqref{eq:thin-prism} луч отклонится к оси на угол
+Согласно \eqref{eq:thin-prism} параллельный оси луч отклонится по направлению к ней на угол
 \begin{equation*}
     \delta = (n - 1) h \left(\frac{1}{R_1} + \frac{1}{R_2}\right)
 \end{equation*}
@@ -114,6 +160,6 @@
     \frac{1}{F} = (n - 1) \left(\frac{1}{R_1} + \frac{1}{R_2}\right).
     \label{eq:lensmaker-formula}
 \end{equation}
-Высота $h$ линейно зависит от угла отклонения $\delta$, а следовательно расстояние $F$~--- константа: все параксиальные лучи, параллельные оси, собираются в одной точке~--- фокусе. Это и есть причина, по которой тонкая линза строит изображение, \lookSecRef{sec:thin-lens}. Для лучей вдали от оси приближение нарушается, и возникает сферическая аберрация, \lookSecRef{sec:aberrations}.
+Угол отклонения $\delta$ пропорционален высоте $h$, поэтому расстояние $F$ от $h$ не зависит: все параллельные оси лучи собираются в одной точке~--- фокусе. 
 
-Радиусы в формуле \eqref{eq:lensmaker-formula} берутся со знаком: положительными для выпуклых поверхностей и отрицательными для вогнутых, для плоской поверхности $R \to \infty$. Так, для плосковыпуклой линзы $F = R / (n - 1)$, а для симметричной двояковыпуклой линзы из стекла с $n \approx 1.5$ фокусное расстояние равно радиусу кривизны её поверхностей, $F = R$. Отрицательное $F$ означает, что линза рассеивающая. Заметим, что формула сохраняет вид и для сферического зеркала, если формально положить $n = -1$ и $R_2 \to \infty$: получаем $F = R / 2$ с точностью до знака, что согласуется с результатом, полученным при изучении аберраций.
+Радиусы в формуле \eqref{eq:lensmaker-formula} берутся со знаком: положительными для выпуклых поверхностей и отрицательными для вогнутых, для плоской поверхности $R \to \infty$. Так, для плосковыпуклой линзы $F = R / (n - 1)$, а для симметричной двояковыпуклой линзы из стекла с показателем преломления $n = 1.5$ фокусное расстояние равно радиусу кривизны её поверхностей, $F = R$. Отрицательное $F$ означает, что линза рассеивающая. Заметим, что формула сохраняет вид и для сферического зеркала, если формально положить $n = -1$ и $R_2 \to \infty$: получаем $F = R / 2$ с точностью до знака, что согласуется с результатом, полученным при изучении аберраций.
