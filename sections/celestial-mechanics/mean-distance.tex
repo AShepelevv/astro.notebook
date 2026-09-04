@@ -1,0 +1,114 @@
+\subsection{Средние расстояния до фокуса}
+\label{sec:mean-distance}
+Что такое среднее расстояние планеты от Солнца? Вопрос не так прост, как кажется: ответ зависит от того, по какой переменной усреднять. Можно усреднять по времени, можно~--- по истинной аномалии, а можно~--- по эксцентрической. Среднее значение величины $f$ по аномалии $x$ за один оборот определим как
+\begin{equation*}
+    \langle f \rangle_x = \frac{1}{2\pi}\int\limits_0^{2\pi} f\,dx.
+\end{equation*}
+
+\paragraph{Связь дифференциалов аномалий} Продифференцируем уравнение Кеплера \eqref{eq:kepler-eq} и воспользуемся выражением \eqref{eq:kepler-eq-r-E} для расстояния до фокуса:
+\begin{gather*}
+    dM = (1 - e\cos E)\,dE = \frac{r}{a}\,dE,\\
+    a\,dM = r\,dE.
+\end{gather*}
+Средняя аномалия по определению растёт равномерно, $M = 2\pi t / T$, поэтому $dt = T\,dM / (2\pi)$. По второму закону Кеплера радиус-вектор за время $dt$ заметает площадь $\frac{1}{2} r^2\,d\nu$, а секториальная скорость постоянна и равна $\pi a b / T$:
+\begin{gather*}
+    \frac{1}{2} r^2\,d\nu = \frac{\pi a b}{T}\,dt = \frac{\pi a b}{T} \cdot \frac{T\,dM}{2\pi} = \frac{ab}{2}\,dM,\\
+    a\,dM = \frac{r^2}{b}\,d\nu = \frac{r^2}{a\sqrt{1 - e^2}}\,d\nu.
+\end{gather*}
+Соберём обе связи в одну цепочку:
+\begin{equation}
+    a\,dM = r\,dE = \frac{r^2}{a\sqrt{1 - e^2}}\,d\nu.
+    \label{eq:anomaly-differentials}
+\end{equation}
+Из неё сразу следуют все три средних расстояния.
+
+\paragraph{По истинной аномалии} Из правого равенства \eqref{eq:anomaly-differentials} $r\,d\nu = a\sqrt{1 - e^2}\,dE = b\,dE$, поэтому
+\begin{equation*}
+    \langle r \rangle_\nu
+    = \frac{1}{2\pi}\int\limits_0^{2\pi} r\,d\nu
+    = \frac{b}{2\pi}\int\limits_0^{2\pi} dE
+    = b.
+\end{equation*}
+
+\paragraph{По эксцентрической аномалии} Из левого равенства $r\,dE = a\,dM$:
+\begin{equation*}
+    \langle r \rangle_E
+    = \frac{1}{2\pi}\int\limits_0^{2\pi} r\,dE
+    = \frac{a}{2\pi}\int\limits_0^{2\pi} dM
+    = a.
+\end{equation*}
+
+\paragraph{По средней аномалии} Это среднее по времени. Из левого равенства $r\,dM = r^2\,dE / a = a (1 - e\cos E)^2\,dE$:
+\begin{multline*}
+    \langle r \rangle_M
+    = \frac{1}{2\pi}\int\limits_0^{2\pi} r\,dM
+    = \frac{a}{2\pi}\int\limits_0^{2\pi} \left(1 - 2e\cos E + e^2\cos^2 E\right) dE = \\
+    = \frac{a}{2\pi}\left(2\pi - 0 + e^2 \pi\right)
+    = a\left(1 + \frac{e^2}{2}\right).
+\end{multline*}
+
+Итак,
+\begin{equation}
+    \langle r \rangle_\nu = a\sqrt{1 - e^2},
+    \qquad
+    \langle r \rangle_E = a,
+    \qquad
+    \langle r \rangle_M = a\left(1 + \frac{e^2}{2}\right).
+    \label{eq:mean-distances}
+\end{equation}
+\begin{wrapfigure}[15]{r}{0.5\tw}
+    \centering
+    \vspace{-0.5pc}
+    \tikzsetnextfilename{mean-distance}
+    \begin{tikzpicture}
+        \footnotesize
+        % Расстояние до фокуса как функция трёх аномалий, e = 0.7.
+        % Все кривые параметризованы эксцентрической аномалией E
+        % (в градусах): r = 1 - e cos E, M = E - e sin E,
+        % tg(nu/2) = sqrt((1 + e) / (1 - e)) tg(E/2)
+        \pgfmathsetmacro{\ecc}{0.7}
+        \pgfmathsetmacro{\meanM}{1 + \ecc * \ecc / 2}
+        \pgfmathsetmacro{\meanNu}{sqrt(1 - \ecc * \ecc)}
+        \pgfmathsetmacro{\kNu}{sqrt((1 + \ecc) / (1 - \ecc))}
+        \begin{axis}[
+            width = 0.5\tw,
+            height = 5.5cm,
+            xmin = -180, xmax = 180,
+            ymin = 0, ymax = 1.8,
+            xtick = {-180, -90, 0, 90, 180},
+            xticklabels = {$-\pi$, $-\pi/2$, $0$, $\pi/2$, $\pi$},
+            xlabel = {аномалия},
+            ylabel = {$r / a$},
+            ytick = {0, 0.5, 1, 1.5},
+            clip = false,
+        ]
+            \addplot [black, thick, domain = -180:180, samples = 91]
+                ({x - \ecc * sin(x) * 180 / pi}, {1 - \ecc * cos(x)})
+                node [pos = 0.78, anchor = south east, inner sep = 1pt] {$M$};
+            \addplot [black, domain = -180:180, samples = 91]
+                ({x}, {1 - \ecc * cos(x)})
+                node [pos = 0.79, anchor = north west, inner sep = 1pt] {$E$};
+            \addplot [black, thin, domain = -180:180, samples = 91]
+                ({2 * atan(\kNu * tan(x / 2))}, {1 - \ecc * cos(x)})
+                node [pos = 0.78, anchor = north west, inner sep = 1pt] {$\nu$};
+            \addplot [thin, dashes] coordinates {(-180, \meanM) (180, \meanM)}
+                node [pos = 1, anchor = west] {$\langle r \rangle_M$};
+            \addplot [thin, dashes] coordinates {(-180, 1) (180, 1)}
+                node [pos = 1, anchor = west] {$\langle r \rangle_E$};
+            \addplot [thin, dashes] coordinates {(-180, \meanNu) (180, \meanNu)}
+                node [pos = 1, anchor = west] {$\langle r \rangle_\nu$};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Расстояние до фокуса как функция средней, эксцентрической и истинной аномалии, $e = 0.7$}
+    \label{pic:mean-distance}
+\end{wrapfigure}
+Три средних упорядочены: $\langle r \rangle_\nu \leqslant \langle r \rangle_E \leqslant \langle r \rangle_M$, и совпадают они только для круговой орбиты, \lookPicRef{pic:mean-distance}. Для планет разница невелика~--- у Земли $e = 0.0167$, и все три средних отличаются от $a$ меньше чем на $0.02\%$. Для комет же разница огромна: у кометы Галлея $e = 0.967$ и $a = 17.8$~\au, откуда $\langle r \rangle_\nu = 4.5$~\au, а $\langle r \rangle_M = 26.1$~\au{} Комета почти всё время находится далеко за орбитой Сатурна, хотя около $80\%$ оборота по истинной аномалии проходит внутри орбиты Юпитера.
+
+\paragraph{Среднее обратное расстояние} Тем же приёмом находится среднее по времени от $1/r$, которое определяет среднюю потенциальную энергию тела на орбите:
+\begin{equation*}
+    \left\langle \frac{1}{r} \right\rangle_M
+    = \frac{1}{2\pi}\int\limits_0^{2\pi} \frac{dM}{r}
+    = \frac{1}{2\pi}\int\limits_0^{2\pi} \frac{dE}{a}
+    = \frac{1}{a}.
+\end{equation*}
+Средняя по времени потенциальная энергия равна $-GMm / a$, как у тела на круговой орбите радиуса $a$. Именно это соотношение используется при выводе полной энергии через теорему о вириале, \lookSecRef{sec:two-body-problem}.
